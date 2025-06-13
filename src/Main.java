@@ -1,11 +1,13 @@
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         FinanceManager manager = new FinanceManager();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         boolean running = true;
 
         while(running) {
@@ -29,7 +31,7 @@ public class Main {
                     break;
 
                 case 3:
-                    handleViewTransactions(manager);
+                    handleViewTransactions(manager, formatter);
                     break;
 
                 case 0:
@@ -84,7 +86,7 @@ public class Main {
         System.out.println("✅ Expense added.");
     }
 
-    public static void handleViewTransactions(FinanceManager manager) {
+    public static void handleViewTransactions(FinanceManager manager, DateTimeFormatter formatter) {
         System.out.println("=== All Transactions ===");
 
         if (manager.getAllTransactions().isEmpty()) {
@@ -93,7 +95,9 @@ public class Main {
         }
 
         for (Transaction t : manager.getAllTransactions()) {
-            System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + t.getDate() + " | " + t.getDescription());
+            String formattedDate = t.getDate().format(formatter);
+            System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription());
+
             if (t instanceof Expense) {
                 System.out.println("   Category: " + ((Expense) t).getCategory());
             }
