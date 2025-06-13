@@ -46,11 +46,14 @@ public class Main {
     }
 
     public static void handleAddIncome(Scanner scanner, FinanceManager manager) {
-        System.out.println("Enter amount: ");
-        double incomeAmount = scanner.nextDouble();
+        double incomeAmount = readAmount(scanner);
         scanner.nextLine();
+
         System.out.print("Enter description: ");
-        String incomeDesc = scanner.nextLine();
+        String incomeDesc = scanner.nextLine().trim();
+        if (incomeDesc.isEmpty()) {
+            incomeDesc = "No description";
+        }
 
         Income income = new Income(incomeAmount, LocalDateTime.now(), incomeDesc);
         manager.addTransaction(income);
@@ -58,8 +61,7 @@ public class Main {
     }
 
     public static void handleAddExpense(Scanner scanner, FinanceManager manager) {
-        System.out.println("Enter Amount: ");
-        double expenseAmount = scanner.nextDouble();
+        double expenseAmount = readAmount(scanner);
         scanner.nextLine();
         System.out.println("Enter description: ");
         String expenseDesc = scanner.nextLine();
@@ -84,11 +86,35 @@ public class Main {
 
     public static void handleViewTransactions(FinanceManager manager) {
         System.out.println("=== All Transactions ===");
-        for(Transaction t : manager.getAllTransactions()) {
+
+        if (manager.getAllTransactions().isEmpty()) {
+            System.out.println("❌ No transactions found! Add some income or expenses to get started. ❌");
+            return;
+        }
+
+        for (Transaction t : manager.getAllTransactions()) {
             System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + t.getDate() + " | " + t.getDescription());
             if (t instanceof Expense) {
                 System.out.println("   Category: " + ((Expense) t).getCategory());
             }
         }
     }
+
+    public static double readAmount(Scanner scanner) {
+        double value = -1;
+        while (value <= 0) {
+            System.out.print("Enter amount: ");
+            try {
+                value = Double.parseDouble(scanner.next());
+                if (value <= 0) {
+                    System.out.println("❗ Please enter a positive number.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a numeric value.");
+            }
+        }
+        return value;
+    }
+
+
 }
