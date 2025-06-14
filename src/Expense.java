@@ -9,7 +9,7 @@ public class Expense extends Transaction{
     }
     @Override
     public String getType() {
-        return "Expense";
+        return "EXPENSE";
     }
 
     public ExpenseCategoryEnum getCategory() {

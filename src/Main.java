@@ -1,22 +1,21 @@
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+
         Scanner scanner = new Scanner(System.in);
         FinanceManager manager = new FinanceManager();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         boolean running = true;
 
+        List<Transaction> loaded = TransactionFileManager.loadTransactions();
+        loaded.forEach(manager::addTransaction);
+
         while(running) {
-            System.out.println("\n===== Personal Finance Tracker =====");
-            System.out.println("1. Add Income");
-            System.out.println("2. Add Expense");
-            System.out.println("3. View All Transactions");
-            System.out.println("0. Exit");
-            System.out.print("Choose an option: ");
+            printMenu();
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // consume new line
@@ -60,12 +59,14 @@ public class Main {
         Income income = new Income(incomeAmount, LocalDateTime.now(), incomeDesc);
         manager.addTransaction(income);
         System.out.println("✅ Income added.");
+        TransactionFileManager.saveTransactions(manager.getAllTransactions());
+
     }
 
     public static void handleAddExpense(Scanner scanner, FinanceManager manager) {
         double expenseAmount = readAmount(scanner);
         scanner.nextLine();
-        System.out.println("Enter description: ");
+        System.out.print("Enter description: ");
         String expenseDesc = scanner.nextLine();
 
         System.out.println("Choose category: ");
@@ -84,6 +85,7 @@ public class Main {
         Expense expense = new Expense(expenseAmount, LocalDateTime.now(), expenseDesc, categoryEnum);
         manager.addTransaction(expense);
         System.out.println("✅ Expense added.");
+        TransactionFileManager.saveTransactions(manager.getAllTransactions());
     }
 
     public static void handleViewTransactions(FinanceManager manager, DateTimeFormatter formatter) {
@@ -96,10 +98,11 @@ public class Main {
 
         for (Transaction t : manager.getAllTransactions()) {
             String formattedDate = t.getDate().format(formatter);
-            System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription());
 
             if (t instanceof Expense) {
-                System.out.println("   Category: " + ((Expense) t).getCategory());
+                System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription() + " | Category: " + ((Expense) t).getCategory());
+            } else {
+                System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription());
             }
         }
     }
@@ -108,8 +111,10 @@ public class Main {
         double value = -1;
         while (value <= 0) {
             System.out.print("Enter amount: ");
+            String input = scanner.next();
+
             try {
-                value = Double.parseDouble(scanner.next());
+                value = Double.parseDouble(input);
                 if (value <= 0) {
                     System.out.println("❗ Please enter a positive number.");
                 }
@@ -119,6 +124,17 @@ public class Main {
         }
         return value;
     }
+
+
+    public static void printMenu() {
+        System.out.println("\n===== Personal Finance Tracker =====");
+        System.out.println("1. Add Income");
+        System.out.println("2. Add Expense");
+        System.out.println("3. View All Transactions");
+        System.out.println("0. Exit");
+        System.out.print("Choose an option: ");
+    }
+
 
 
 }
