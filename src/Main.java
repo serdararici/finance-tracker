@@ -40,7 +40,7 @@ public class Main {
                     handleFilterTransactions(scanner, manager, formatter);
                     break;
                 case 6:
-                    //handleDeleteTransaction(scanner, manager);
+                    handleDeleteTransaction(scanner, manager);
                     break;
                 case 0:
                     running = false;
@@ -153,10 +153,12 @@ public class Main {
         double income = manager.getTotalIncome();
         double expense = manager.getTotalExpense();
         double balance = manager.getBalance();
+        int transactionCount = manager.getAllTransactions().size();
 
         System.out.printf("Total Income:  %.2f₺\n", income);
         System.out.printf("Total Expense: %.2f₺\n", expense);
         System.out.printf("Balance:       %.2f₺\n", balance);
+        System.out.println("Total Transactions: " + transactionCount);
         System.out.println("----------------------------------");
 
         if (balance > 0) {
@@ -241,6 +243,46 @@ public class Main {
                 }
             }
         }
+    }
+
+    public static void handleDeleteTransaction(Scanner scanner, FinanceManager manager) {
+        List<Transaction> transactions = manager.getAllTransactions();
+
+        if(transactions.isEmpty()) {
+            System.out.println("❌ No transactions available to delete.");
+            return;
+        }
+
+        System.out.println("=== Delete a Transaction ===");
+        for (int i = 0; i < transactions.size(); i++) {
+            Transaction t = transactions.get(i);
+            System.out.printf("[%d] %s | %.2f₺ | %s | %s\n", i + 1, t.getType(), t.getAmount(), t.getDate(), t.getDescription());
+        }
+
+        System.out.print("Enter the transaction number to delete (0 to cancel): ");
+        int choice;
+        try {
+            choice = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Invalid input. Deletion cancelled.");
+            return;
+        }
+
+        if (choice == 0) {
+            System.out.println("🚫 Deletion cancelled.");
+            return;
+        }
+
+        if (choice < 1 || choice > transactions.size()) {
+            System.out.println("❌ Invalid transaction number.");
+            return;
+        }
+
+        Transaction removed = transactions.remove(choice - 1);
+        System.out.println("✅ Transaction deleted: " + removed.getType() + " | " + removed.getAmount() + "₺");
+
+        // Save updated list to file
+        TransactionFileManager.saveTransactions(transactions);
     }
 
 }
