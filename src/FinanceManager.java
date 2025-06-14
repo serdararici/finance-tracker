@@ -15,4 +15,29 @@ public class FinanceManager {
     public List<Transaction> getAllTransactions() {
         return transactions;
     }
+
+    public double getTotalIncome() {
+        double total = 0;
+        for(Transaction t : transactions) {
+            if(t instanceof Income) {
+                total += t.getAmount();
+            }
+        }
+        return  total;
+    }
+
+    public double getTotalExpense() {
+        double total = 0;
+        for(Transaction t : transactions) {
+            if(t instanceof Expense) {
+                total += t.getAmount();
+            }
+        }
+        return total;
+    }
+
+    public double getBalance() {
+        return getTotalIncome() - getTotalExpense();
+    }
+
 }

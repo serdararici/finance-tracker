@@ -24,23 +24,29 @@ public class Main {
                 case 1:
                     handleAddIncome(scanner, manager);
                     break;
-
                 case 2:
                     handleAddExpense(scanner, manager);
                     break;
-
                 case 3:
                     handleViewTransactions(manager, formatter);
                     break;
-
+                case 4:
+                    handleSummary(manager);
+                    break;
+                case 5:
+                    //handleFilterTransactions(scanner, manager, formatter);
+                    break;
+                case 6:
+                    //handleDeleteTransaction(scanner, manager);
+                    break;
                 case 0:
                     running = false;
                     System.out.println("👋 Goodbye!");
                     break;
-
                 default:
                     System.out.println("❗ Invalid option. Try again.");
             }
+
         }
 
         scanner.close();
@@ -131,8 +137,32 @@ public class Main {
         System.out.println("1. Add Income");
         System.out.println("2. Add Expense");
         System.out.println("3. View All Transactions");
+        System.out.println("4. View Summary");
+        System.out.println("5. Filter Transactions");
+        System.out.println("6. Delete a Transaction");
         System.out.println("0. Exit");
         System.out.print("Choose an option: ");
+    }
+
+    public static void handleSummary(FinanceManager manager) {
+        System.out.println("\n=== Financial Summary ===");
+
+        double income = manager.getTotalIncome();
+        double expense = manager.getTotalExpense();
+        double balance = manager.getBalance();
+
+        System.out.printf("Total Income:  %.2f₺\n", income);
+        System.out.printf("Total Expense: %.2f₺\n", expense);
+        System.out.printf("Balance:       %.2f₺\n", balance);
+        System.out.println("----------------------------------");
+
+        if (balance > 0) {
+            System.out.println("🟢 You are in surplus.");
+        } else if (balance < 0) {
+            System.out.println("🔴 You are in deficit.");
+        } else {
+            System.out.println("🟡 Your balance is neutral.");
+        }
     }
 
 
