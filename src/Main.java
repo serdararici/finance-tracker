@@ -1,5 +1,8 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,7 +37,7 @@ public class Main {
                     handleSummary(manager);
                     break;
                 case 5:
-                    //handleFilterTransactions(scanner, manager, formatter);
+                    handleFilterTransactions(scanner, manager, formatter);
                     break;
                 case 6:
                     //handleDeleteTransaction(scanner, manager);
@@ -165,6 +168,79 @@ public class Main {
         }
     }
 
+    public static void handleFilterTransactions(Scanner scanner, FinanceManager manager, DateTimeFormatter formatter) {
+        System.out.println("\n=== Filter Transactions ===");
+        System.out.println("Filter by:");
+        System.out.println("1. Date");
+        System.out.println("2. Type (INCOME/EXPENSE)");
+        System.out.println("3. Expense Category");
 
+        System.out.println("Choose filter type: ");
+        String choice = scanner.nextLine().trim();
+
+        List<Transaction> filtered = new ArrayList<>();
+
+        switch (choice) {
+            case "1":
+                System.out.print("Enter date (dd-MM-yyyy): ");
+                String dateInput = scanner.nextLine();
+                try {
+                    DateTimeFormatter customFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    LocalDate filterDate = LocalDate.parse(dateInput, customFormat);
+                    for (Transaction t : manager.getAllTransactions()) {
+                        if(t.getDate().toLocalDate().equals(filterDate)) {
+                            filtered.add(t);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Invalid date format.");
+                    return;
+                }
+                break;
+
+            case "2":
+                System.out.print("Enter type (INCOME/EXPENSE): ");
+                String typeInput = scanner.nextLine().toUpperCase();
+                for (Transaction t : manager.getAllTransactions()) {
+                    if (t.getType().equalsIgnoreCase(typeInput)) {
+                        filtered.add(t);
+                    }
+                }
+                break;
+
+            case "3":
+                System.out.print("Enter category (e.g. FOOD, BILLS): ");
+                String categoryInput = scanner.nextLine().toUpperCase();
+                for (Transaction t : manager.getAllTransactions()) {
+                    if (t instanceof Expense) {
+                        Expense e = (Expense) t;
+                        if (e.getCategory().toString().equalsIgnoreCase(categoryInput)) {
+                            filtered.add(t);
+                        }
+                    }
+                }
+                break;
+
+            default:
+                System.out.println("❌ Invalid option.");
+                return;
+        }
+
+        // Filtered results
+        if (filtered.isEmpty()) {
+            System.out.println("❗ No transactions found with this filter.");
+        } else {
+            System.out.println("\n--- Filtered Transactions ---");
+            for (Transaction t : filtered) {
+                String formattedDate = t.getDate().format(formatter);
+
+                if (t instanceof Expense) {
+                    System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription() + " | Category: " + ((Expense) t).getCategory());
+                } else {
+                    System.out.println(t.getType() + " | " + t.getAmount() + "₺ | " + formattedDate + " | " + t.getDescription());
+                }
+            }
+        }
+    }
 
 }
