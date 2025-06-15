@@ -1,7 +1,10 @@
 public enum ExpenseCategoryEnum {
     FOOD,
-    TRANSPORT,
     RENT,
+    TRANSPORT,
+    ELECTRONICS,
+    SHOPPING,
+    HEALTH,
     ENTERTAINMENT,
     OTHERS
 }
